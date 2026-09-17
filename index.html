@@ -1,1 +1,483 @@
-1
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTK Pipe Viewer — Raspberry Pi 2</title>
+
+<style>
+:root {
+    --bg: #070a12;
+    --card: #101624;
+    --card2: #151d2e;
+    --text: #f2f5ff;
+    --muted: #9aa7bd;
+    --purple: #8b5cf6;
+    --cyan: #22d3ee;
+    --green: #34d399;
+    --border: #263149;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 15% 0%, #24164f 0, transparent 35%),
+        radial-gradient(circle at 90% 15%, #063c46 0, transparent 28%),
+        var(--bg);
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    line-height: 1.7;
+}
+
+.container {
+    width: min(1050px, calc(100% - 32px));
+    margin: auto;
+}
+
+.hero {
+    padding: 80px 0 55px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 7px 14px;
+    border: 1px solid rgba(52,211,153,.3);
+    border-radius: 999px;
+    background: rgba(52,211,153,.08);
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 20px 0 10px;
+    font-size: clamp(42px, 8vw, 76px);
+    line-height: 1;
+    letter-spacing: -0.05em;
+}
+
+.hero p {
+    max-width: 720px;
+    color: var(--muted);
+    font-size: 19px;
+}
+
+nav {
+    position: sticky;
+    top: 12px;
+    z-index: 10;
+    margin-bottom: 22px;
+    padding: 9px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(16,22,36,.82);
+    backdrop-filter: blur(15px);
+}
+
+nav a {
+    display: inline-block;
+    padding: 7px 11px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 9px;
+    font-size: 14px;
+}
+
+nav a:hover {
+    background: var(--card2);
+    color: white;
+}
+
+.card {
+    margin: 20px 0;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: rgba(16,22,36,.88);
+    box-shadow: 0 18px 60px rgba(0,0,0,.22);
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 29px;
+}
+
+h3 {
+    margin-bottom: 7px;
+}
+
+p {
+    color: var(--muted);
+}
+
+.step {
+    position: relative;
+    margin: 30px 0;
+    padding-left: 58px;
+}
+
+.number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--purple), #a78bfa);
+    font-weight: 800;
+}
+
+pre {
+    overflow-x: auto;
+    margin: 14px 0;
+    padding: 18px;
+    border: 1px solid #202a40;
+    border-radius: 13px;
+    background: #05070c;
+    color: #dce5ff;
+}
+
+code {
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+}
+
+:not(pre) > code {
+    padding: 3px 7px;
+    border: 1px solid rgba(139,92,246,.25);
+    border-radius: 6px;
+    background: rgba(139,92,246,.1);
+    color: #c4b5fd;
+}
+
+.info {
+    margin: 20px 0;
+    padding: 16px 18px;
+    border-left: 4px solid var(--cyan);
+    border-radius: 8px;
+    background: rgba(34,211,238,.06);
+}
+
+.warning {
+    margin: 20px 0;
+    padding: 16px 18px;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    background: rgba(245,158,11,.06);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+}
+
+.item {
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card2);
+}
+
+.item strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+footer {
+    padding: 50px 0;
+    color: #68758c;
+    text-align: center;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header class="hero">
+    <span class="badge">Raspberry Pi 2 • Lightweight YouTube</span>
+
+    <h1>GTK Pipe Viewer</h1>
+
+    <p>
+        A lightweight graphical YouTube player for a Raspberry Pi 2,
+        designed to avoid the overhead of running a full modern browser.
+    </p>
+</header>
+
+<nav>
+    <a href="#requirements">Requirements</a>
+    <a href="#install">Install</a>
+    <a href="#launch">Launch</a>
+    <a href="#performance">Performance</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+</nav>
+
+<section class="card" id="requirements">
+
+<h2>01 · Requirements</h2>
+
+<div class="grid">
+
+    <div class="item">
+        <strong>🧠 Raspberry Pi</strong>
+        Pi 2 Model B
+    </div>
+
+    <div class="item">
+        <strong>🐧 Operating System</strong>
+        Raspberry Pi OS / Debian-based Linux
+    </div>
+
+    <div class="item">
+        <strong>🌐 Network</strong>
+        Ethernet or USB Wi-Fi
+    </div>
+
+    <div class="item">
+        <strong>🔊 Audio</strong>
+        HDMI, USB audio, or another working audio output
+    </div>
+
+</div>
+
+<div class="info">
+    Open a terminal on your Raspberry Pi and run the commands
+    below one at a time.
+</div>
+
+</section>
+
+
+<section class="card" id="install">
+
+<h2>02 · Installation</h2>
+
+<div class="step">
+
+<div class="number">1</div>
+
+<h3>Update your package list</h3>
+
+<pre><code>sudo apt update</code></pre>
+
+</div>
+
+
+<div class="step">
+
+<div class="number">2</div>
+
+<h3>Install the basic dependencies</h3>
+
+<pre><code>sudo apt install git mpv perl -y</code></pre>
+
+<p>
+<code>mpv</code> is the media player that can handle the actual
+video playback.
+</p>
+
+</div>
+
+
+<div class="step">
+
+<div class="number">3</div>
+
+<h3>Download Pipe Viewer</h3>
+
+<pre><code>git clone https://github.com/trizen/pipe-viewer.git
+cd pipe-viewer</code></pre>
+
+</div>
+
+
+<div class="step">
+
+<div class="number">4</div>
+
+<h3>Install Pipe Viewer</h3>
+
+<pre><code>sudo make install</code></pre>
+
+<div class="warning">
+    If <code>make install</code> produces an error, stop there and
+    read the error message. Dependencies for older software can
+    change depending on your Raspberry Pi OS version.
+</div>
+
+</div>
+
+</section>
+
+
+<section class="card" id="launch">
+
+<h2>03 · Start it</h2>
+
+<p>
+After installation, try:
+</p>
+
+<pre><code>gtk-pipe-viewer</code></pre>
+
+<p>
+If everything installed correctly, the GTK graphical interface
+should open.
+</p>
+
+<div class="info">
+    From there you can search for YouTube videos and send them
+    to the media player.
+</div>
+
+</section>
+
+
+<section class="card" id="performance">
+
+<h2>04 · Make the Pi 2 happier</h2>
+
+<p>
+The Pi 2 is capable of video playback, but modern YouTube formats
+can be demanding. For smoother playback:
+</p>
+
+<div class="grid">
+
+<div class="item">
+    <strong>📺 Lower resolution</strong>
+    Try 360p or 480p before higher resolutions.
+</div>
+
+<div class="item">
+    <strong>🧹 Close other apps</strong>
+    Free as much RAM and CPU as possible.
+</div>
+
+<div class="item">
+    <strong>⚡ Use mpv</strong>
+    Avoid running a heavyweight browser at the same time.
+</div>
+
+<div class="item">
+    <strong>📡 Stable Wi-Fi</strong>
+    A good network connection helps prevent buffering.
+</div>
+
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h2>05 · Useful commands</h2>
+
+<pre><code># Launch GTK Pipe Viewer
+gtk-pipe-viewer
+
+# Check mpv
+mpv --version
+
+# Check your Pi architecture
+uname -m
+
+# Check Raspberry Pi OS
+cat /etc/os-release</code></pre>
+
+</section>
+
+
+<section class="card" id="troubleshooting">
+
+<h2>06 · Troubleshooting</h2>
+
+<h3>❌ “gtk-pipe-viewer: command not found”</h3>
+
+<p>
+The installation probably did not complete successfully, or the
+program was installed somewhere outside your current PATH.
+Go back into the Pipe Viewer directory and inspect the output of
+<code>sudo make install</code>.
+</p>
+
+
+<h3>❌ The video does not play</h3>
+
+<p>
+YouTube frequently changes its delivery systems. Third-party
+players can therefore stop working until their extraction
+dependencies are updated.
+</p>
+
+
+<h3>❌ Video playback is extremely slow</h3>
+
+<p>
+Try a lower resolution and close other applications. The Pi 2 has
+only 1 GB of RAM and considerably less CPU power than newer
+Raspberry Pi boards.
+</p>
+
+
+<h3>❌ No sound</h3>
+
+<p>
+Check the Raspberry Pi's selected audio output and test another
+local audio/video file. If local playback also has no sound,
+the problem is probably system audio rather than Pipe Viewer.
+</p>
+
+</section>
+
+
+<section class="card">
+
+<h2>⚡ Quick Install</h2>
+
+<p>
+If you just want the commands in one block:
+</p>
+
+<pre><code>sudo apt update
+sudo apt install git mpv perl -y
+git clone https://github.com/trizen/pipe-viewer.git
+cd pipe-viewer
+sudo make install
+gtk-pipe-viewer</code></pre>
+
+</section>
+
+
+<footer>
+    Raspberry Pi 2 • GTK Pipe Viewer
+</footer>
+
+</div>
+
+</body>
+</html>
